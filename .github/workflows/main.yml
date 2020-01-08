@@ -22,19 +22,3 @@ jobs:
 
     - name: Publish to GPR
       run: docker push "docker.pkg.github.com/$GITHUB_REPOSITORY/app:latest"
-
-  deploy:
-    runs-on: ubuntu-18.04
-    needs: build_docker_image
-    steps:
-    - name: multiple command
-      uses: appleboy/ssh-action@master
-      with:
-        host: ec2-54-153-19-189.us-west-1.compute.amazonaws.com
-        username: centos
-        key: ${{ secrets.SSH_KEY }}
-        port: 22
-        script: |
-          docker login docker.pkg.github.com -u $GITHUB_ACTOR -p $GITHUB_TOKEN
-          docker pull docker.pkg.github.com/$GITHUB_REPOSITORY/app:latest
-          docker run --detach --publish 80:5000 --name app docker.pkg.github.com/$GITHUB_REPOSITORY/app:latest
